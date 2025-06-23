@@ -1,0 +1,18 @@
+# GoLand
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# 임시 파일
+*.tmp
+*.swp
+*~
+
+# 운영체제 관련 파일
+.DS_Store
+Thumbs.db
+
+# 기타
+.env
+*.log
