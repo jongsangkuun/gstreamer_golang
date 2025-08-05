@@ -16,3 +16,4 @@ Thumbs.db
 # 기타
 .env
 *.log
+hls_output/*

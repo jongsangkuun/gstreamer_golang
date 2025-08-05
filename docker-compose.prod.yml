@@ -1,0 +1,10 @@
+services:
+  rtsp2hls:
+    environment:
+      DEBUG: ${PROD_DEBUG}
+      GST_DEBUG_LEVEL: ${PROD_GST_DEBUG_LEVEL}
+      HLS_OUTPUT: ${PROD_HLS_OUTPUT}
+      HLS_BACKUP: ${PROD_HLS_BACKUP}
+  file_server:
+    environment:
+      DEBUG: ${PROD_DEBUG}
