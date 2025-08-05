@@ -1,0 +1,40 @@
+services:
+  rtsp2hls:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./hls_output:/app/hls_output
+      - .:/app
+    restart: unless-stopped
+    entrypoint:
+      - go
+    command:
+      - run
+      - cmd/convert/main.go
+    networks:
+      - rtsp_network
+
+
+  file_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./hls_output:/app/hls_output
+    depends_on:
+      - rtsp2hls
+    networks:
+      - rtsp_network
+    entrypoint:
+      - go
+    command:
+      - run
+      - cmd/file_server/main.go
+
+networks:
+  rtsp_network:
+    driver: bridge

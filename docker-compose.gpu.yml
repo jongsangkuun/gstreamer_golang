@@ -1,0 +1,49 @@
+services:
+  rtsp2hls:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    volumes:
+      - ./hls_output:/app/hls_output
+      - .:/app
+    restart: unless-stopped
+    networks:
+      - rtsp_network
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,video,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu, compute, video, utility]
+    entrypoint:
+      - go
+    command:
+      - run
+      - cmd/convert/main.go
+
+
+  file_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./hls_output:/app/hls_output
+    depends_on:
+      - rtsp2hls
+    networks:
+      - rtsp_network
+    entrypoint:
+      - go
+    command:
+      - run
+      - cmd/file_server/main.go
+
+networks:
+  rtsp_network:
+    driver: bridge

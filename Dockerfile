@@ -1,0 +1,58 @@
+FROM ubuntu:24.04
+
+WORKDIR /app
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Seoul
+ENV CGO_ENABLED=1
+ENV GOPATH=/go
+ENV PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+ENV PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+
+RUN apt-get update && apt-get install -y wget git build-essential pkg-config && \
+    apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl \
+    gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio libglib2.0-dev
+
+#RUN if [ "$(uname -m)" = "x86_64" ]; then \
+#    wget -qO - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub | apt-key add - && \
+#    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
+#    apt-get update && apt-get install -y --no-install-recommends \
+#        nvidia-cuda-toolkit nvidia-cuda-dev nvidia-container-toolkit \
+#        cmake meson ninja-build libglew-dev libssl-dev libopencv-dev \
+#        nasm yasm libx264-dev python3-pip flex bison && \
+#    mkdir -p /opt/nvidia && cd /opt/nvidia && \
+#    wget https://developer.download.nvidia.com/compute/cuda/redist/nvidia-video-codec-sdk/nvidia-video-codec-sdk-12.1.14.tar.xz && \
+#    tar -xf nvidia-video-codec-sdk-12.1.14.tar.xz && \
+#    rm nvidia-video-codec-sdk-12.1.14.tar.xz && \
+#    cp -r nvidia-video-codec-sdk-12.1.14/Interface/* /usr/local/include/ && \
+#    git clone --depth 1 https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git && \
+#    cd gst-plugins-bad && \
+#    apt-get update && apt-get install -y --no-install-recommends \
+#        libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libglib2.0-dev && \
+#    meson setup build -Dnvcodec=enabled -Dnvenc=enabled -Dnvdec=enabled -Dcuda=enabled -Dgpl=enabled && \
+#    meson compile -C build && \
+#    meson install -C build && \
+#    ldconfig && \
+#    gst-inspect-1.0 | grep nvh264enc || echo "nvh264enc 플러그인이 설치되지 않았습니다."; \
+#fi
+
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz -O go.tar.gz; \
+else \
+    wget https://go.dev/dl/go1.24.1.linux-arm64.tar.gz -O go.tar.gz; \
+fi && \
+    tar -C /usr/local -xzf go.tar.gz && \
+    rm go.tar.gz
+
+COPY . .
+
+RUN go mod download
+
+#RUN GOARCH=$(go env GOARCH) go build  -o rtsp2hls ./cmd/convert/main.go
+#
+#RUN GOARCH=$(go env GOARCH) go build  -o file_server ./cmd/file_server/main.go
+
+RUN mkdir -p /app/hls_output
+RUN mkdir -p /app/hls_backup
