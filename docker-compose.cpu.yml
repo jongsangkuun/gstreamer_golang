@@ -35,6 +35,24 @@ services:
       - run
       - cmd/file_server/main.go
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./hls_output:/app/hls_output
+      - .:/app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    entrypoint:
+      - go
+    command:
+      - run
+      - cmd/api/main.go
+    networks:
+      - rtsp_network
+
 networks:
   rtsp_network:
     driver: bridge

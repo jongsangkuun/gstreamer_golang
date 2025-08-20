@@ -11,3 +11,10 @@ services:
     environment:
       DEBUG: ${DEV_DEBUG}
       ENV_STATE: ${ENV_STATE}
+
+  api:
+    environment:
+      DEBUG: ${DEV_DEBUG}
+      GST_DEBUG_LEVEL: ${DEV_GST_DEBUG_LEVEL}
+      HLS_OUTPUT: ${DEV_HLS_OUTPUT}
+      HLS_BACKUP: ${DEV_HLS_BACKUP}

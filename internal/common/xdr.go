@@ -1,8 +1,7 @@
-package pipeline
+package common
 
 import (
 	"fmt"
-	"github.com/go-gst/go-gst/gst"
 	"os"
 )
 
@@ -10,21 +9,6 @@ const (
 	runtimeDirMode   = 0700
 	runtimeDirPrefix = "/tmp/runtime-"
 )
-
-// GStreamer를 초기화합니다.
-func InitGstreamer(gstDebugLevel string) error {
-	// GStreamer 초기화
-	gst.Init(nil)
-
-	// GStreamer 디버그 레벨 설정
-	if gstDebugLevel != "" {
-		if err := os.Setenv("GST_DEBUG", gstDebugLevel); err != nil {
-			return fmt.Errorf("GStreamer 디버그 레벨 설정 실패: %w", err)
-		}
-	}
-
-	return nil
-}
 
 // SetupXDGRuntimeDir는 XDG_RUNTIME_DIR 환경 변수가 설정되어 있지 않은 경우
 // 임시 디렉토리를 생성하고 해당 환경 변수를 설정합니다.

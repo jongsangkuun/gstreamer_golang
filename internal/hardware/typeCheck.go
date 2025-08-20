@@ -1,4 +1,4 @@
-package validation
+package hardware
 
 import (
 	"os/exec"
@@ -38,7 +38,7 @@ func HasNvidiaGPU() HardwareType {
 
 // 하드웨어 타입을 감지합니다.
 func DetectHardware() HardwareType {
-	if HasNvidiaGPU() == "GPU" && runtime.GOARCH == "amd64" {
+	if HasNvidiaGPU() == "GPU" && runtime.GOARCH == string(ArchitectureAMD64) {
 		return HardwareTypeGPU
 	} else {
 		return HardwareTypeCPU
