@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+var CommonEnv, _ = ParseEnv()
+
 type Env struct {
 	HlsOutput     string
 	HlsBackup     string
