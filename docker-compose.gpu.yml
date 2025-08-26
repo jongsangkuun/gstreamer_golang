@@ -1,11 +1,12 @@
 services:
-  rtsp2hls:
+  api:
     build:
       context: .
       dockerfile: Dockerfile.gpu
     volumes:
       - ./hls_output:/app/hls_output
       - .:/app
+      - ./data:/app/data
     restart: unless-stopped
     networks:
       - rtsp_network
@@ -18,6 +19,8 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu, compute, video, utility]
+    ports:
+      - "8080:8080"
     entrypoint:
       - go
     command:
@@ -43,6 +46,7 @@ services:
     command:
       - run
       - cmd/file_server/main.go
+
 
 networks:
   rtsp_network:

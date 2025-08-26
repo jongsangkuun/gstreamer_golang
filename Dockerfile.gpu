@@ -50,7 +50,7 @@ COPY . .
 
 RUN go mod download
 
-# RUN GOARCH=$(go env GOARCH) go build -o rtsp2hls ./cmd/example/main.go
-# RUN GOARCH=$(go env GOARCH) go build -o file_server ./cmd/file_server/main.go
 RUN mkdir -p /app/hls_output
-RUN mkdir -p /app/hls_backup
+
+# RUN GOARCH=$(go env GOARCH) go build -o api ./cmd/api/main.go
+# RUN GOARCH=$(go env GOARCH) go build -o file_server ./cmd/file_server/main.go

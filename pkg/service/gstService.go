@@ -6,12 +6,15 @@ import (
 	"sync"
 
 	"github.com/go-gst/go-glib/glib"
+	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/address"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/common"
+	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/db"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/log"
 	pipe "gitlab.hds-robotcenter.com/gstreamer-convert/internal/pipeline"
+	"gorm.io/gorm"
 )
 
-func GstServiceStart(env common.Env) (*glib.MainLoop, *pipe.PipelineManager, error) {
+func GstServiceStart(env common.Env, dbConn *gorm.DB) (*glib.MainLoop, *pipe.PipelineManager, error) {
 	err := pipe.InitGstreamer(env.GstDebugLevel)
 	if err != nil {
 		return nil, nil, err
@@ -20,6 +23,14 @@ func GstServiceStart(env common.Env) (*glib.MainLoop, *pipe.PipelineManager, err
 	err = common.SetupXDGRuntimeDir()
 	if err != nil {
 		return nil, nil, err
+	}
+
+	var addresses address.RTSPInformationList
+
+	allRtspStreams, err := db.GetAllRTSPStreams(dbConn)
+
+	for _, stream := range allRtspStreams {
+		addresses = append(addresses, stream.ToRTSPInformation())
 	}
 
 	// 출력 디렉토리 설정
@@ -35,7 +46,7 @@ func GstServiceStart(env common.Env) (*glib.MainLoop, *pipe.PipelineManager, err
 	pipelineManager := pipe.NewPipelineManager()
 	// 스트림 처리를 위한 WaitGroup
 	var wg sync.WaitGroup
-	pipe.CreatePipelines(pipelineManager, &wg, outputDir)
+	pipe.CreatePipelines(pipelineManager, &wg, addresses, outputDir)
 
 	// 모든 파이프라인이 생성될 때까지 대기
 	wg.Wait()

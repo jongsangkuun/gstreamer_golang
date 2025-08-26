@@ -58,9 +58,10 @@ func BuildPipeline(rtspInfo *address.RTSPInformation, outputDir string) string {
 	return fmt.Sprintf("%s ! %s ! %s", source, process, output)
 }
 
-func CreatePipelines(pm *PipelineManager, wg *sync.WaitGroup, baseOutputDir string) {
+// Database select 추가
+func CreatePipelines(pm *PipelineManager, wg *sync.WaitGroup, addresses address.RTSPInformationList, baseOutputDir string) {
 	// RTSP 설정 정보 가져오기 (10개 스트림)
-	rtspConfigs := address.DefaultRTSPInformations()
+	rtspConfigs := addresses
 
 	if len(rtspConfigs) == 0 {
 		log.Info("생성할 RTSP 스트림이 없습니다")
