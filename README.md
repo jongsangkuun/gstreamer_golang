@@ -98,3 +98,12 @@ docker-compose -f docker-compose.gpu.yml down
 - NVIDIA 드라이버 설치
 - NVIDIA Container Toolkit 설치
 - Docker 및 Docker Compose 설치
+
+## SQLite
+- sqlite3 을 통해서 postgres 대채
+- 굳이 postgres 컨테이너를 올려서 작업할 이유가 없음
+- 어짜피 미디어서버는 하나의 온프레미스 환경에서 동작할 것으로 보임
+- 또한 많은 양의 데이터를 저장할 것은 아님
+- 로그에 관련된 데이터는 추후 다른 로그 서버 등의 서비스를 통해서 진행하는게 좋아보임
+- connection pool 도 동작하고 백업도 하드백업을 통해서 처리하기 쉬워보임
+- 

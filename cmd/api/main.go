@@ -1,15 +1,20 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/address"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/common"
+	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/db"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/log"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/pipeline"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/pkg/service"
 )
+
+type responseSchema struct {
+	Status  int         `json:"status"`  // HTTP Status Code
+	Message string      `json:"message"` // OK, ERROR
+	Data    interface{} `json:"data"`    // Additional Data
+}
 
 func main() {
 	env, err := common.ParseEnv()
@@ -18,7 +23,19 @@ func main() {
 	}
 
 	log.Init()
-	mainLoop, pm, err := service.GstServiceStart(env)
+
+	dbConn, err := db.ConnectSQLite(env.SqliteDbPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.CloseConnection()
+
+	_, err = db.InitializeDatabase(env.SqliteDbPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mainLoop, pm, err := service.GstServiceStart(env, dbConn)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,19 +44,23 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "ok",
-		})
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    "",
+		}
+		c.JSON(200, response)
 	})
 
 	// 모든 파이브라인 정보 조회
 	router.GET("/pipeline/all", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": pm.GetAllPipelineInfo(),
-			// data 필드는 스웨거 완성 전 임시로 넣어둔 데이터
-			"data": "0 == StatusCreating, 1 == StatusRunning, 2 == StatusStopped, 3 == StatusError",
-		})
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    pm.GetAllPipelineInfo(),
+		}
 
+		c.JSON(200, response)
 	})
 
 	// streamName의 파이프라인 정보 조회
@@ -47,61 +68,76 @@ func main() {
 		streamName := c.Param("streamName")
 		pipelineInfo, exists := pm.GetPipeline(streamName)
 		if !exists {
-			c.JSON(404, gin.H{
-				"error":      "Pipeline not found",
-				"streamName": streamName,
-			})
+			response := responseSchema{
+				Status:  404,
+				Message: "Pipeline not found",
+				Data:    streamName,
+			}
+			c.JSON(404, response)
 			return
 		}
 
-		c.JSON(200, gin.H{
-			"message": pipelineInfo,
-		})
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    pipelineInfo,
+		}
+		c.JSON(200, response)
 	})
 
 	// streamName 파이프라인 정지
 	router.POST("/pipeline/:streamName/stop", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "ok",
-		})
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    "",
+		}
+		c.JSON(200, response)
 	})
 
 	// streamName 파이프라인 생성
 	router.PUT("/pipeline", func(c *gin.Context) {
 		var rtspInfo address.RTSPInformation
 		if err := c.ShouldBindJSON(&rtspInfo); err != nil {
-			c.JSON(400, gin.H{
-				"error":   "Invalid JSON format",
-				"details": err.Error(),
-			})
+			response := responseSchema{
+				Status:  400,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(400, response)
 			return
 		}
 
 		// 이미 같은 이름의 파이프라인이 존재하는지 확인
 		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
-			c.JSON(409, gin.H{
-				"error":      "Pipeline already exists",
-				"streamName": rtspInfo.Name,
-			})
+			response := responseSchema{
+				Status:  409,
+				Message: "fail",
+				Data:    "Pipeline already exists",
+			}
+			c.JSON(409, response)
 			return
 		}
 
 		success := pipeline.CreateStreamPipeline(pm, rtspInfo, env.HlsOutput)
 
 		if !success {
-			c.JSON(500, gin.H{
-				"error":      "Failed to create pipeline",
-				"streamName": rtspInfo.Name,
-			})
+			response := responseSchema{
+				Status:  500,
+				Message: "fail",
+				Data:    "Failed to create pipeline",
+			}
+			c.JSON(500, response)
 			return
 		}
 
-		c.JSON(200, gin.H{
-			"message":    "Pipeline created successfully",
-			"streamName": rtspInfo.Name,
-			"outputPath": fmt.Sprintf("%s/%s/index.m3u8", env.HlsOutput, rtspInfo.Name),
-		})
-
+		_, err = db.CreateRTSPStream(dbConn, rtspInfo)
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    "",
+		}
+		c.JSON(200, response)
 	})
 
 	// streamName 파이프라인 변경
@@ -120,15 +156,20 @@ func main() {
 		// 이름이 없다면 에러 리턴
 		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
 			pipeline.CreateStreamPipeline(pm, rtspInfo, env.HlsOutput)
-			c.JSON(200, gin.H{
-				"message": "ok",
-			})
+			response := responseSchema{
+				Status:  200,
+				Message: "ok",
+				Data:    "",
+			}
+			c.JSON(200, response)
 			return
 		} else {
-			c.JSON(404, gin.H{
-				"error":      "Pipeline not found",
-				"streamName": rtspInfo.Name,
-			})
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    "Pipeline not found",
+			}
+			c.JSON(404, response)
 		}
 
 	})
@@ -138,24 +179,36 @@ func main() {
 		streamName := c.Param("streamName")
 		exists := pm.RemovePipeline(streamName)
 		if exists != nil {
-			c.JSON(404, gin.H{
-				"error":      "Pipeline not found",
-				"streamName": streamName,
-			})
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    exists.Error(),
+			}
+			c.JSON(404, response)
 			return
 		}
-		c.JSON(200, gin.H{
-			"message": "ok",
-		})
+
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    "",
+		}
+		c.JSON(200, response)
 	})
 
 	// streamName 파이프라인 삭제
 	router.DELETE("/pipeline/all", func(c *gin.Context) {
 		pm.CleanupAllPipelines()
-		c.JSON(200, gin.H{
-			"message": "ok",
-		})
+		response := responseSchema{
+			Status:  200,
+			Message: "ok",
+			Data:    "",
+		}
+		c.JSON(200, response)
 	})
 
-	router.Run() // listen and serve on 0.0.0.0:8080
+	err = router.Run() // listen and serve on 0.0.0.0:8080
+	if err != nil {
+		panic(err)
+	}
 }

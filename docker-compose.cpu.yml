@@ -1,17 +1,20 @@
 services:
-  rtsp2hls:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ./hls_output:/app/hls_output
       - .:/app
+      - ./data:/app/data
     restart: unless-stopped
+    ports:
+      - "8080:8080"
     entrypoint:
       - go
     command:
       - run
-      - cmd/convert/main.go
+      - cmd/api/main.go
     networks:
       - rtsp_network
 
@@ -26,7 +29,7 @@ services:
     volumes:
       - ./hls_output:/app/hls_output
     depends_on:
-      - rtsp2hls
+      - api
     networks:
       - rtsp_network
     entrypoint:
@@ -35,23 +38,7 @@ services:
       - run
       - cmd/file_server/main.go
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./hls_output:/app/hls_output
-      - .:/app
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    entrypoint:
-      - go
-    command:
-      - run
-      - cmd/api/main.go
-    networks:
-      - rtsp_network
+
 
 networks:
   rtsp_network:

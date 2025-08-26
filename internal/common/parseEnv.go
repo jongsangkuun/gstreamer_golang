@@ -5,35 +5,34 @@ import (
 	"os"
 )
 
-var CommonEnv, _ = ParseEnv()
-
 type Env struct {
 	HlsOutput     string
-	HlsBackup     string
 	GstDebugLevel string
+
+	SqliteDbPath string
 }
 
+const (
+	hlsOutputKey     = "HLS_OUTPUT"
+	gstDebugLevelKey = "GST_DEBUG_LEVEL"
+	sqliteDbPathKey  = "SQLITE_DB_PATH"
+)
+
 func ParseEnv() (Env, error) {
-	const (
-		hlsOutputKey     = "HLS_OUTPUT"
-		hlsBackupKey     = "HLS_BACKUP"
-		gstDebugLevelKey = "GST_DEBUG_LEVEL"
-	)
 
 	hlsOutput := os.Getenv(hlsOutputKey)
-	hlsBackup := os.Getenv(hlsBackupKey)
 	gstDebugLevel := os.Getenv(gstDebugLevelKey)
+	sqliteDbPath := os.Getenv(sqliteDbPathKey)
 
 	env := Env{
 		HlsOutput:     hlsOutput,
-		HlsBackup:     hlsBackup,
 		GstDebugLevel: gstDebugLevel,
+		SqliteDbPath:  sqliteDbPath,
 	}
 
-	if hlsOutput == "" && hlsBackup == "" {
-		return Env{}, fmt.Errorf("필수 환경변수가 설정되지 않았습니다: %s 또는 %s", hlsOutputKey, hlsBackupKey)
+	if hlsOutput == "" {
+		return Env{}, fmt.Errorf("필수 환경변수가 설정되지 않았습니다: %s 또는 %s", hlsOutputKey)
 	}
 
 	return env, nil
-
 }
