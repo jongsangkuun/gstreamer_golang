@@ -80,13 +80,16 @@ func (pm *PipelineManager) UpdatePipeline(streamName string, pipeline *gst.Pipel
 }
 
 // 파이프라인 상태 업데이트
-func (pm *PipelineManager) UpdatePipelineStatus(streamName string, status PipelineStatus) {
+func (pm *PipelineManager) UpdatePipelineStatus(streamName string, status PipelineStatus) error {
 	pm.mu.Lock()
 	defer pm.mu.Unlock()
 
 	if info, exists := pm.Pipelines[streamName]; exists {
 		info.Status = status
 		log.Info(fmt.Sprintf("[%s] 파이프라인 상태 변경: %d", streamName, status))
+		return nil
+	} else {
+		return fmt.Errorf("streamName %s not found", streamName)
 	}
 }
 

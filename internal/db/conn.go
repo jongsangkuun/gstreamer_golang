@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/lib/pq" // PostgreSQL driver
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/address"
+	pipe "gitlab.hds-robotcenter.com/gstreamer-convert/internal/pipeline"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -25,6 +26,7 @@ type RTSPStream struct {
 	MaxFiles       int       `gorm:"default:10" json:"max_files"`
 	PlaylistLength int       `gorm:"default:5" json:"playlist_length"`
 	TargetDuration int       `gorm:"default:1" json:"target_duration"`
+	IsActive       bool      `gorm:"default:true" json:"is_active"`
 	CreatedAt      time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt      time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }
@@ -161,13 +163,13 @@ func SeedData(db *gorm.DB) error {
 // RTSP Stream 관련 데이터베이스 함수들
 func GetAllRTSPStreams(db *gorm.DB) ([]RTSPStream, error) {
 	var streams []RTSPStream
-	err := db.Find(&streams).Error
+	err := db.Where("is_active = ?", true).Find(&streams).Error
 	return streams, err
 }
 
 func GetRTSPStreamByName(db *gorm.DB, name string) (*RTSPStream, error) {
 	var stream RTSPStream
-	err := db.Where("name = ?", name).First(&stream).Error
+	err := db.Where("name = ? AND is_active = ?", name, true).First(&stream).Error
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +178,7 @@ func GetRTSPStreamByName(db *gorm.DB, name string) (*RTSPStream, error) {
 
 func GetRTSPStreamByID(db *gorm.DB, id uint) (*RTSPStream, error) {
 	var stream RTSPStream
-	err := db.Where("id = ? AND ", id).First(&stream).Error
+	err := db.Where("id = ? AND is_active = ?", id, true).First(&stream).Error
 	if err != nil {
 		return nil, err
 	}
@@ -194,9 +196,9 @@ func CreateRTSPStream(db *gorm.DB, rtspInfo address.RTSPInformation) (*RTSPStrea
 	return stream, nil
 }
 
-func UpdateRTSPStream(db *gorm.DB, id uint, rtspInfo address.RTSPInformation) (*RTSPStream, error) {
+func UpdateRTSPStream(db *gorm.DB, rtspInfo address.RTSPInformation) (*RTSPStream, error) {
 	var stream RTSPStream
-	if err := db.First(&stream, id).Error; err != nil {
+	if err := db.First(&stream, rtspInfo.Name).Error; err != nil {
 		return nil, err
 	}
 
@@ -212,9 +214,26 @@ func UpdateRTSPStream(db *gorm.DB, id uint, rtspInfo address.RTSPInformation) (*
 	return &stream, nil
 }
 
-func DeleteRTSPStream(db *gorm.DB, id uint) error {
+func UpdateStreamActiveStatus(db *gorm.DB, streamName string, status pipe.PipelineStatus) error {
+	if status == pipe.StatusRunning {
+		return db.Model(&RTSPStream{}).Where("name = ?", streamName).Update("is_active", true).Error
+	} else {
+		return db.Model(&RTSPStream{}).Where("name = ?", streamName).Update("is_active", false).Error
+	}
+}
+
+func DeleteSoftRTSPStream(db *gorm.DB, name string) error {
 	// 소프트 삭제 (is_active를 false로 설정)
-	return db.Model(&RTSPStream{}).Where("id = ?", id).Error
+	return db.Model(&RTSPStream{}).Where("name = ?", name).Update("is_active", false).Error
+}
+
+func DeleteHardRTSPStream(db *gorm.DB, name string) error {
+	// 하드 삭제
+	return db.Model(&RTSPStream{}).Where("name = ?", name).Delete(&RTSPStream{}).Error
+}
+
+func DeleteAllRTSPStream(db *gorm.DB) error {
+	return db.Model(&RTSPStream{}).Delete(&RTSPStream{}).Error
 }
 
 // 모든 RTSP Stream을 RTSPInformation 형태로 반환

@@ -22,7 +22,7 @@ func handlePipelineError(pipeline *gst.Pipeline, streamName string, pm *Pipeline
 		log.Error(fmt.Sprintf("[%s] 파이프라인 정지 실패: %v", streamName, err))
 	}
 
-	pm.UpdatePipelineStatus(streamName, StatusError)
+	_ = pm.UpdatePipelineStatus(streamName, StatusError)
 }
 
 // 종료 시그널 처리를 설정합니다.
