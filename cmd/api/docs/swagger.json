@@ -1,0 +1,356 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline": {
+            "put": {
+                "description": "RTSP 정보를 받아 새 파이프라인을 생성합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Create a pipeline",
+                "parameters": [
+                    {
+                        "description": "RTSP info",
+                        "name": "rtsp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "같은 이름의 파이프라인이 있으면 새 설정으로 덮어씁니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Update (recreate) a pipeline",
+                "parameters": [
+                    {
+                        "description": "RTSP info",
+                        "name": "rtsp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/all": {
+            "get": {
+                "description": "모든 파이프라인 정보를 반환합니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Get all pipelines",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Delete all pipelines",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/{streamName}": {
+            "get": {
+                "description": "streamName에 해당하는 파이프라인 정보를 반환합니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Get a pipeline by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pipeline (stream) name",
+                        "name": "streamName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Delete a pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pipeline (stream) name",
+                        "name": "streamName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/{streamName}/start": {
+            "post": {
+                "description": "streamName 파이프라인을 실행 상태로 변경합니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Start a pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pipeline (stream) name",
+                        "name": "streamName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/{streamName}/stop": {
+            "post": {
+                "description": "streamName 파이프라인을 정지 상태로 변경합니다.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Stop a pipeline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Pipeline (stream) name",
+                        "name": "streamName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/cmd_api.responseSchema"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "cmd_api.responseSchema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Additional Data"
+                },
+                "message": {
+                    "description": "success, fail",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "HTTP Status Code",
+                    "type": "integer"
+                }
+            }
+        },
+        "gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation": {
+            "type": "object",
+            "properties": {
+                "bitrate": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "max_files": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "playlist_length": {
+                    "type": "integer"
+                },
+                "target_duration": {
+                    "type": "integer"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "use_gpu": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}

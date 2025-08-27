@@ -1,0 +1,232 @@
+definitions:
+  cmd_api.responseSchema:
+    properties:
+      data:
+        description: Additional Data
+      message:
+        description: success, fail
+        type: string
+      status:
+        description: HTTP Status Code
+        type: integer
+    type: object
+  gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation:
+    properties:
+      bitrate:
+        type: integer
+      id:
+        type: integer
+      max_files:
+        type: integer
+      name:
+        type: string
+      playlist_length:
+        type: integer
+      target_duration:
+        type: integer
+      url:
+        type: string
+      use_gpu:
+        type: boolean
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Health check
+      tags:
+      - system
+  /pipeline:
+    post:
+      consumes:
+      - application/json
+      description: 같은 이름의 파이프라인이 있으면 새 설정으로 덮어씁니다.
+      parameters:
+      - description: RTSP info
+        in: body
+        name: rtsp
+        required: true
+        schema:
+          $ref: '#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Update (recreate) a pipeline
+      tags:
+      - pipeline
+    put:
+      consumes:
+      - application/json
+      description: RTSP 정보를 받아 새 파이프라인을 생성합니다.
+      parameters:
+      - description: RTSP info
+        in: body
+        name: rtsp
+        required: true
+        schema:
+          $ref: '#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Create a pipeline
+      tags:
+      - pipeline
+  /pipeline/{streamName}:
+    delete:
+      parameters:
+      - description: Pipeline (stream) name
+        in: path
+        name: streamName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Delete a pipeline
+      tags:
+      - pipeline
+    get:
+      description: streamName에 해당하는 파이프라인 정보를 반환합니다.
+      parameters:
+      - description: Pipeline (stream) name
+        in: path
+        name: streamName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Get a pipeline by name
+      tags:
+      - pipeline
+  /pipeline/{streamName}/start:
+    post:
+      description: streamName 파이프라인을 실행 상태로 변경합니다.
+      parameters:
+      - description: Pipeline (stream) name
+        in: path
+        name: streamName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Start a pipeline
+      tags:
+      - pipeline
+  /pipeline/{streamName}/stop:
+    post:
+      description: streamName 파이프라인을 정지 상태로 변경합니다.
+      parameters:
+      - description: Pipeline (stream) name
+        in: path
+        name: streamName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Stop a pipeline
+      tags:
+      - pipeline
+  /pipeline/all:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Delete all pipelines
+      tags:
+      - pipeline
+    get:
+      description: 모든 파이프라인 정보를 반환합니다.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/cmd_api.responseSchema'
+      summary: Get all pipelines
+      tags:
+      - pipeline
+swagger: "2.0"

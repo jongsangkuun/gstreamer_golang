@@ -8,6 +8,9 @@ import (
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/log"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/internal/pipeline"
 	"gitlab.hds-robotcenter.com/gstreamer-convert/pkg/service"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type responseSchema struct {
@@ -42,6 +45,17 @@ func main() {
 	defer service.GstServiceStop(mainLoop, pm)
 
 	router := gin.Default()
+
+	// Swagger JSON 정적 서빙 (실제 위치: cmd/api/docs/swagger.json)
+	router.StaticFile("/swagger/doc.json", "./cmd/api/docs/swagger.json")
+
+	// Swagger UI
+	router.GET("/swagger/*any",
+		ginSwagger.WrapHandler(
+			swaggerFiles.Handler,
+			ginSwagger.URL("/swagger/doc.json"),
+		),
+	)
 
 	router.GET("/health", func(c *gin.Context) {
 		response := responseSchema{
@@ -295,8 +309,7 @@ func main() {
 		c.JSON(200, response)
 	})
 
-	err = router.Run() // listen and serve on 0.0.0.0:8080
-	if err != nil {
+	if err := router.Run(":8080"); err != nil {
 		panic(err)
 	}
 }
