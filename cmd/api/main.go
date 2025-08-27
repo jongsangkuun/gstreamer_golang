@@ -12,7 +12,7 @@ import (
 
 type responseSchema struct {
 	Status  int         `json:"status"`  // HTTP Status Code
-	Message string      `json:"message"` // OK, ERROR
+	Message string      `json:"message"` // success, fail
 	Data    interface{} `json:"data"`    // Additional Data
 }
 
@@ -46,7 +46,7 @@ func main() {
 	router.GET("/health", func(c *gin.Context) {
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    "",
 		}
 		c.JSON(200, response)
@@ -56,7 +56,7 @@ func main() {
 	router.GET("/pipeline/all", func(c *gin.Context) {
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    pm.GetAllPipelineInfo(),
 		}
 
@@ -79,17 +79,73 @@ func main() {
 
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    pipelineInfo,
 		}
 		c.JSON(200, response)
 	})
 
 	// streamName 파이프라인 정지
-	router.POST("/pipeline/:streamName/stop", func(c *gin.Context) {
+	router.POST("/pipeline/:streamName/start", func(c *gin.Context) {
+		pipelineName := c.Param("streamName")
+		err = pm.UpdatePipelineStatus(pipelineName, pipeline.StatusRunning)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+			return
+		}
+
+		err = db.UpdateStreamActiveStatus(dbConn, pipelineName, pipeline.StatusRunning)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+			return
+		}
+
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
+			Data:    "",
+		}
+		c.JSON(200, response)
+	})
+
+	// streamName 파이프라인 정지
+	router.POST("/pipeline/:streamName/stop", func(c *gin.Context) {
+		pipelineName := c.Param("streamName")
+		err = pm.UpdatePipelineStatus(pipelineName, pipeline.StatusRunning)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+			return
+		}
+
+		err = db.UpdateStreamActiveStatus(dbConn, pipelineName, pipeline.StatusRunning)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+			return
+		}
+
+		response := responseSchema{
+			Status:  200,
+			Message: "success",
 			Data:    "",
 		}
 		c.JSON(200, response)
@@ -134,7 +190,7 @@ func main() {
 		_, err = db.CreateRTSPStream(dbConn, rtspInfo)
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    "",
 		}
 		c.JSON(200, response)
@@ -154,15 +210,19 @@ func main() {
 		// 같은 이름의 파이프라인이 존재하는지 확인
 		// 파이프라인 존재 시 create로 덮어씌움
 		// 이름이 없다면 에러 리턴
+		var rtspData address.RTSPInformation
 		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
 			pipeline.CreateStreamPipeline(pm, rtspInfo, env.HlsOutput)
-			response := responseSchema{
-				Status:  200,
-				Message: "ok",
-				Data:    "",
+			_, err := db.UpdateRTSPStream(dbConn, rtspInfo)
+			if err != nil {
+				response := responseSchema{
+					Status:  500,
+					Message: "fail",
+					Data:    err.Error(),
+				}
+				c.JSON(500, response)
+				return
 			}
-			c.JSON(200, response)
-			return
 		} else {
 			response := responseSchema{
 				Status:  404,
@@ -172,6 +232,13 @@ func main() {
 			c.JSON(404, response)
 		}
 
+		response := responseSchema{
+			Status:  200,
+			Message: "success",
+			Data:    rtspData,
+		}
+		c.JSON(200, response)
+		return
 	})
 
 	// streamName 파이프라인 삭제
@@ -188,9 +255,19 @@ func main() {
 			return
 		}
 
+		err = db.DeleteHardRTSPStream(dbConn, streamName)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+		}
+
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    "",
 		}
 		c.JSON(200, response)
@@ -199,9 +276,20 @@ func main() {
 	// streamName 파이프라인 삭제
 	router.DELETE("/pipeline/all", func(c *gin.Context) {
 		pm.CleanupAllPipelines()
+		err = db.DeleteAllRTSPStream(dbConn)
+		if err != nil {
+			response := responseSchema{
+				Status:  404,
+				Message: "fail",
+				Data:    err.Error(),
+			}
+			c.JSON(404, response)
+			return
+		}
+
 		response := responseSchema{
 			Status:  200,
-			Message: "ok",
+			Message: "success",
 			Data:    "",
 		}
 		c.JSON(200, response)

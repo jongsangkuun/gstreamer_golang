@@ -129,7 +129,10 @@ func CreateStreamPipeline(pm *PipelineManager, rtspInfo address.RTSPInformation,
 		return false
 	}
 
-	pm.UpdatePipelineStatus(streamName, StatusRunning)
+	err = pm.UpdatePipelineStatus(streamName, StatusRunning)
+	if err != nil {
+		return false
+	}
 
 	log.Info(fmt.Sprintf("[%s] 파이프라인 시작됨. HLS 경로: %s/index.m3u8",
 		streamName, outputDir))
@@ -143,7 +146,7 @@ func setupPipelineMessageHandler(pipeline *gst.Pipeline, streamName string, pm *
 		switch msg.Type() {
 		case gst.MessageEOS:
 			log.Info(fmt.Sprintf("[%s] 스트림 종료", streamName))
-			pm.UpdatePipelineStatus(streamName, StatusStopped)
+			_ = pm.UpdatePipelineStatus(streamName, StatusStopped)
 			if err := pipeline.BlockSetState(gst.StateNull); err != nil {
 				log.Error(fmt.Sprintf("[%s] 파이프라인 정지 실패: %v", streamName, err))
 				return false
@@ -152,7 +155,7 @@ func setupPipelineMessageHandler(pipeline *gst.Pipeline, streamName string, pm *
 		case gst.MessageError:
 			err := msg.ParseError()
 			log.Error(fmt.Sprintf("[%s] 오류: %s", streamName, err.Error()))
-			pm.UpdatePipelineStatus(streamName, StatusError)
+			_ = pm.UpdatePipelineStatus(streamName, StatusError)
 
 			if debug := err.DebugString(); debug != "" {
 				log.Error(fmt.Sprintf("[%s] 디버그: %s", streamName, debug))
