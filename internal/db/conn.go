@@ -232,8 +232,9 @@ func DeleteHardRTSPStream(db *gorm.DB, name string) error {
 	return db.Model(&RTSPStream{}).Where("name = ?", name).Delete(&RTSPStream{}).Error
 }
 
+// GORM v1.20+ 에서는 WHERE 조건 없이 모든 레코드를 삭제하는 것을 방지함. 따라서 1=1 같은 조건을 입력
 func DeleteAllRTSPStream(db *gorm.DB) error {
-	return db.Model(&RTSPStream{}).Delete(&RTSPStream{}).Error
+	return db.Model(&RTSPStream{}).Where("1 = 1").Delete(&RTSPStream{}).Error
 }
 
 // 모든 RTSP Stream을 RTSPInformation 형태로 반환

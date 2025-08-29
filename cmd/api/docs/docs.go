@@ -28,7 +28,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -54,7 +54,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                            "$ref": "#/definitions/address.RTSPInformation"
                         }
                     }
                 ],
@@ -62,25 +62,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -104,7 +104,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                            "$ref": "#/definitions/address.RTSPInformation"
                         }
                     }
                 ],
@@ -112,25 +112,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -150,7 +150,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -167,13 +167,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -202,13 +202,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -234,13 +234,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -269,13 +269,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -304,13 +304,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -318,23 +318,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "cmd_api.responseSchema": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Additional Data"
-                },
-                "message": {
-                    "description": "success, fail",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "HTTP Status Code",
-                    "type": "integer"
-                }
-            }
-        },
-        "gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation": {
+        "address.RTSPInformation": {
             "type": "object",
             "properties": {
                 "bitrate": {
@@ -362,18 +346,34 @@ const docTemplate = `{
                     "type": "boolean"
                 }
             }
+        },
+        "main.responseSchema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Additional Data"
+                },
+                "message": {
+                    "description": "success, fail",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "HTTP Status Code",
+                    "type": "integer"
+                }
+            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	BasePath:         "/",
+	Schemes:          []string{"http"},
+	Title:            "GStreamer Media Server API",
+	Description:      "RTSP → HLS 변환 파이프라인 관리 및 상태 조회 API",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

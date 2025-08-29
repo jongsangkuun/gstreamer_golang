@@ -1,8 +1,15 @@
 {
+    "schemes": [
+        "http"
+    ],
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "RTSP → HLS 변환 파이프라인 관리 및 상태 조회 API",
+        "title": "GStreamer Media Server API",
+        "contact": {},
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/health": {
             "get": {
@@ -17,7 +24,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -43,7 +50,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                            "$ref": "#/definitions/address.RTSPInformation"
                         }
                     }
                 ],
@@ -51,25 +58,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -93,7 +100,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation"
+                            "$ref": "#/definitions/address.RTSPInformation"
                         }
                     }
                 ],
@@ -101,25 +108,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -139,7 +146,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -156,13 +163,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -191,13 +198,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -223,13 +230,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -258,13 +265,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -293,13 +300,13 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/cmd_api.responseSchema"
+                            "$ref": "#/definitions/main.responseSchema"
                         }
                     }
                 }
@@ -307,23 +314,7 @@
         }
     },
     "definitions": {
-        "cmd_api.responseSchema": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Additional Data"
-                },
-                "message": {
-                    "description": "success, fail",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "HTTP Status Code",
-                    "type": "integer"
-                }
-            }
-        },
-        "gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation": {
+        "address.RTSPInformation": {
             "type": "object",
             "properties": {
                 "bitrate": {
@@ -349,6 +340,22 @@
                 },
                 "use_gpu": {
                     "type": "boolean"
+                }
+            }
+        },
+        "main.responseSchema": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Additional Data"
+                },
+                "message": {
+                    "description": "success, fail",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "HTTP Status Code",
+                    "type": "integer"
                 }
             }
         }

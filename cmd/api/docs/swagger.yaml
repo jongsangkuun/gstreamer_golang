@@ -1,16 +1,6 @@
+basePath: /
 definitions:
-  cmd_api.responseSchema:
-    properties:
-      data:
-        description: Additional Data
-      message:
-        description: success, fail
-        type: string
-      status:
-        description: HTTP Status Code
-        type: integer
-    type: object
-  gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation:
+  address.RTSPInformation:
     properties:
       bitrate:
         type: integer
@@ -29,8 +19,22 @@ definitions:
       use_gpu:
         type: boolean
     type: object
+  main.responseSchema:
+    properties:
+      data:
+        description: Additional Data
+      message:
+        description: success, fail
+        type: string
+      status:
+        description: HTTP Status Code
+        type: integer
+    type: object
 info:
   contact: {}
+  description: RTSP → HLS 변환 파이프라인 관리 및 상태 조회 API
+  title: GStreamer Media Server API
+  version: "1.0"
 paths:
   /health:
     get:
@@ -40,7 +44,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Health check
       tags:
       - system
@@ -55,26 +59,26 @@ paths:
         name: rtsp
         required: true
         schema:
-          $ref: '#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation'
+          $ref: '#/definitions/address.RTSPInformation'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Update (recreate) a pipeline
       tags:
       - pipeline
@@ -88,26 +92,26 @@ paths:
         name: rtsp
         required: true
         schema:
-          $ref: '#/definitions/gitlab_hds-robotcenter_com_gstreamer-convert_internal_address.RTSPInformation'
+          $ref: '#/definitions/address.RTSPInformation'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Create a pipeline
       tags:
       - pipeline
@@ -125,11 +129,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Delete a pipeline
       tags:
       - pipeline
@@ -147,11 +151,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Get a pipeline by name
       tags:
       - pipeline
@@ -170,11 +174,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Start a pipeline
       tags:
       - pipeline
@@ -193,11 +197,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Stop a pipeline
       tags:
       - pipeline
@@ -209,11 +213,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Delete all pipelines
       tags:
       - pipeline
@@ -225,8 +229,10 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/cmd_api.responseSchema'
+            $ref: '#/definitions/main.responseSchema'
       summary: Get all pipelines
       tags:
       - pipeline
+schemes:
+- http
 swagger: "2.0"
