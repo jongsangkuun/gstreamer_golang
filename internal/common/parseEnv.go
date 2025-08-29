@@ -10,12 +10,17 @@ type Env struct {
 	GstDebugLevel string
 
 	SqliteDbPath string
+
+	FileServerHost string
+	FileServerPort string
 }
 
 const (
-	hlsOutputKey     = "HLS_OUTPUT"
-	gstDebugLevelKey = "GST_DEBUG_LEVEL"
-	sqliteDbPathKey  = "SQLITE_DB_PATH"
+	hlsOutputKey      = "HLS_OUTPUT"
+	gstDebugLevelKey  = "GST_DEBUG_LEVEL"
+	sqliteDbPathKey   = "SQLITE_DB_PATH"
+	fileServerHostKey = "FILE_SERVER_HOST"
+	fileServerPortKey = "FILE_SERVER_PORT"
 )
 
 func ParseEnv() (Env, error) {
@@ -23,11 +28,15 @@ func ParseEnv() (Env, error) {
 	hlsOutput := os.Getenv(hlsOutputKey)
 	gstDebugLevel := os.Getenv(gstDebugLevelKey)
 	sqliteDbPath := os.Getenv(sqliteDbPathKey)
+	fileServerHost := os.Getenv(fileServerHostKey)
+	fileServerPort := os.Getenv(fileServerPortKey)
 
 	env := Env{
-		HlsOutput:     hlsOutput,
-		GstDebugLevel: gstDebugLevel,
-		SqliteDbPath:  sqliteDbPath,
+		HlsOutput:      hlsOutput,
+		GstDebugLevel:  gstDebugLevel,
+		SqliteDbPath:   sqliteDbPath,
+		FileServerHost: fileServerHost,
+		FileServerPort: fileServerPort,
 	}
 
 	if hlsOutput == "" {

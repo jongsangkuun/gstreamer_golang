@@ -5,6 +5,8 @@ services:
       GST_DEBUG_LEVEL: ${DEV_GST_DEBUG_LEVEL}
       HLS_OUTPUT: ${DEV_HLS_OUTPUT}
       SQLITE_DB_PATH: ${DEV_SQLITE_DB_PATH}
+      FILE_SERVER_HOST: ${FILE_SERVER_HOST}
+      FILE_SERVER_PORT: ${FILE_SERVER_PORT}
 
   file_server:
     environment:

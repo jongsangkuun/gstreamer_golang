@@ -23,16 +23,16 @@ type RTSPInformationList []RTSPInformation
 
 func DefaultRTSPInformations() RTSPInformationList {
 	rtspInformationList := RTSPInformationList{
-		{0, "hanwha1", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
-		{1, "hanwha2", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
-		{2, "hanwha3", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
-		{3, "bluecop1-1", "rtsp://192.168.1.123:8554/stream1", BitrateSD, false, 10, 5, 1},
-		{4, "bluecop2-1", "rtsp://192.168.1.123:8554/stream2", BitrateSD, false, 10, 5, 1},
-		{5, "bluecop3-1", "rtsp://192.168.1.123:8554/stream3", BitrateSD, false, 10, 5, 1},
-		{6, "bluecop4-1", "rtsp://192.168.1.123:8554/stream4", BitrateSD, false, 10, 5, 1},
-		{7, "bluecop5-1", "rtsp://192.168.1.123:8554/stream5", BitrateSD, false, 10, 5, 1},
-		{8, "bluecop6-1", "rtsp://192.168.1.123:8554/stream6", BitrateSD, false, 10, 5, 1},
-		{9, "bluecop7-1", "rtsp://192.168.1.123:8554/stream7", BitrateSD, false, 10, 5, 1},
+		{1, "hanwha1", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
+		{2, "hanwha2", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
+		{3, "hanwha3", "rtsp://admin:hdshds3112@192.168.1.25:558/LiveChannel/0/media.smp", BitrateSD, false, 10, 5, 1},
+		{4, "bluecop1-1", "rtsp://192.168.1.123:8554/stream1", BitrateSD, false, 10, 5, 1},
+		{5, "bluecop2-1", "rtsp://192.168.1.123:8554/stream2", BitrateSD, false, 10, 5, 1},
+		{6, "bluecop3-1", "rtsp://192.168.1.123:8554/stream3", BitrateSD, false, 10, 5, 1},
+		{7, "bluecop4-1", "rtsp://192.168.1.123:8554/stream4", BitrateSD, false, 10, 5, 1},
+		{8, "bluecop5-1", "rtsp://192.168.1.123:8554/stream5", BitrateSD, false, 10, 5, 1},
+		{9, "bluecop6-1", "rtsp://192.168.1.123:8554/stream6", BitrateSD, false, 10, 5, 1},
+		{10, "bluecop7-1", "rtsp://192.168.1.123:8554/stream7", BitrateSD, false, 10, 5, 1},
 	}
 
 	return rtspInformationList
