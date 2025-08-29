@@ -170,6 +170,88 @@ func createPipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env co
 			return
 		}
 
+		// DB에 RTSP 스트림 정보 저장
+		_, err := db.CreateRTSPStream(dbConn, rtspInfo)
+		if err != nil {
+			response := createResponse(http.StatusInternalServerError, "fail", err.Error())
+			c.JSON(http.StatusInternalServerError, response)
+			return
+		}
+
+		response := createResponse(http.StatusOK, "success", "")
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+func updatePipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env common.Env) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var rtspInfo address.RTSPInformation
+		if err := c.ShouldBindJSON(&rtspInfo); err != nil {
+			response := createResponse(http.StatusBadRequest, "fail", err.Error())
+			c.JSON(http.StatusBadRequest, response)
+			return
+		}
+
+		var rtspData address.RTSPInformation
+		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
+			pipeline.CreateStreamPipeline(pm, rtspInfo, env.HlsOutput)
+			_, err := db.UpdateRTSPStream(dbConn, rtspInfo)
+			if err != nil {
+				response := createResponse(http.StatusInternalServerError, "fail", err.Error())
+				c.JSON(http.StatusInternalServerError, response)
+				return
+			}
+		} else {
+			response := createResponse(http.StatusNotFound, "fail", "Pipeline not found")
+			c.JSON(http.StatusNotFound, response)
+			return
+		}
+
+		response := createResponse(http.StatusOK, "success", rtspData)
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+func deletePipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		streamName := c.Param("streamName")
+		err := pm.UpdatePipelineStatus(streamName, pipeline.StatusStopped)
+		if err != nil {
+			response := createResponse(http.StatusNotFound, "fail", err.Error())
+			c.JSON(http.StatusNotFound, response)
+			return
+		}
+
+		err = pm.RemovePipeline(streamName)
+		if err != nil {
+			response := createResponse(http.StatusNotFound, "fail", err.Error())
+			c.JSON(http.StatusNotFound, response)
+			return
+		}
+
+		err = db.DeleteHardRTSPStream(dbConn, streamName)
+		if err != nil {
+			response := createResponse(http.StatusNotFound, "fail", err.Error())
+			c.JSON(http.StatusNotFound, response)
+			return
+		}
+
+		response := createResponse(http.StatusOK, "success", "")
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+func deleteAllPipelinesHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		pm.CleanupAllPipelines()
+
+		err := db.DeleteAllRTSPStream(dbConn)
+		if err != nil {
+			response := createResponse(http.StatusNotFound, "fail", err.Error())
+			c.JSON(http.StatusNotFound, response)
+			return
+		}
+
 		response := createResponse(http.StatusOK, "success", "")
 		c.JSON(http.StatusOK, response)
 	}
@@ -211,6 +293,9 @@ func main() {
 	router.POST("/pipeline/:streamName/start", startPipelineHandler(dbConn, pm))
 	router.POST("/pipeline/:streamName/stop", stopPipelineHandler(dbConn, pm))
 	router.PUT("/pipeline", createPipelineHandler(dbConn, pm, env))
+	router.PATCH("/pipeline", updatePipelineHandler(dbConn, pm, env))
+	router.DELETE("/pipeline/:streamName", deletePipelineHandler(dbConn, pm))
+	router.DELETE("/pipeline/all", deleteAllPipelinesHandler(dbConn, pm))
 
 	router.Run()
 }
