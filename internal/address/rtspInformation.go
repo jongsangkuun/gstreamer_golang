@@ -11,7 +11,7 @@ const (
 type RTSPInformation struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
-	URL            string `json:"url"`
+	RtspUrl        string `json:"rtsp_url"`
 	Bitrate        int    `json:"bitrate"`
 	UseGPU         bool   `json:"use_gpu"`
 	MaxFiles       int    `json:"max_files"`

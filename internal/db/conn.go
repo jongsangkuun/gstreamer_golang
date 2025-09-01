@@ -82,7 +82,7 @@ func setupConnectionPool(sqlDB *sql.DB) {
 func (r *RTSPStream) FromRTSPInformation(rtsp address.RTSPInformation) {
 	r.ID = uint(rtsp.Id)
 	r.Name = rtsp.Name
-	r.URL = rtsp.URL
+	r.URL = rtsp.RtspUrl
 	r.Bitrate = rtsp.Bitrate
 	r.UseGPU = rtsp.UseGPU
 	r.MaxFiles = rtsp.MaxFiles
@@ -95,7 +95,7 @@ func (r *RTSPStream) ToRTSPInformation() address.RTSPInformation {
 	return address.RTSPInformation{
 		Id:             int(r.ID),
 		Name:           r.Name,
-		URL:            r.URL,
+		RtspUrl:        r.URL,
 		Bitrate:        r.Bitrate,
 		UseGPU:         r.UseGPU,
 		MaxFiles:       r.MaxFiles,

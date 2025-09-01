@@ -61,7 +61,7 @@ func ConvertPipelineInfoToResponse(rtspInfo *address.RTSPInformation, env common
 	return GetPipeLineResponse{
 		Id:             rtspInfo.Id,
 		Name:           rtspInfo.Name,
-		RtspURL:        rtspInfo.URL,
+		RtspURL:        rtspInfo.RtspUrl,
 		HlsURL:         fmt.Sprintf("%s:%s/%s/index.m3u8", env.FileServerHost, env.FileServerPort, rtspInfo.Name),
 		Bitrate:        rtspInfo.Bitrate,
 		UseGPU:         rtspInfo.UseGPU,

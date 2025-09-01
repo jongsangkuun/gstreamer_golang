@@ -30,7 +30,7 @@ func NewPipelineConfig(information address.RTSPInformation, hlsOutputDir string)
 // BuildPipeline은 설정에 따라 파이프라인 문자열을 생성합니다
 func BuildPipeline(rtspInfo *address.RTSPInformation, outputDir string) string {
 	// 소스 부분 구성
-	source := fmt.Sprintf("rtspsrc location=\"%s\" latency=0 buffer-mode=auto do-rtcp=true do-rtsp-keep-alive=true", rtspInfo.URL)
+	source := fmt.Sprintf("rtspsrc location=\"%s\" latency=0 buffer-mode=auto do-rtcp=true do-rtsp-keep-alive=true", rtspInfo.RtspUrl)
 
 	// 처리 파이프라인 구성 (CPU/GPU에 따라 다름)
 	var process string
