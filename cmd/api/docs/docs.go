@@ -17,6 +17,7 @@ const docTemplate = `{
     "paths": {
         "/health": {
             "get": {
+                "description": "서버 상태를 확인합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -26,9 +27,21 @@ const docTemplate = `{
                 "summary": "Health check",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "서버 정상",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -36,7 +49,7 @@ const docTemplate = `{
         },
         "/pipeline": {
             "put": {
-                "description": "RTSP 정보를 받아 새 파이프라인을 생성합니다.",
+                "description": "RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다",
                 "consumes": [
                     "application/json"
                 ],
@@ -46,10 +59,10 @@ const docTemplate = `{
                 "tags": [
                     "pipeline"
                 ],
-                "summary": "Create a pipeline",
+                "summary": "Create a pipeline (PUT)",
                 "parameters": [
                     {
-                        "description": "RTSP info",
+                        "description": "새 파이프라인 RTSP 정보",
                         "name": "rtsp",
                         "in": "body",
                         "required": true,
@@ -60,33 +73,81 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 생성 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "잘못된 요청 본문",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "409": {
-                        "description": "Conflict",
+                        "description": "파이프라인이 이미 존재함",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "파이프라인 생성 또는 DB 저장 실패",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "post": {
-                "description": "같은 이름의 파이프라인이 있으면 새 설정으로 덮어씁니다.",
+                "description": "기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다",
                 "consumes": [
                     "application/json"
                 ],
@@ -96,10 +157,10 @@ const docTemplate = `{
                 "tags": [
                     "pipeline"
                 ],
-                "summary": "Update (recreate) a pipeline",
+                "summary": "Update a pipeline (POST)",
                 "parameters": [
                     {
-                        "description": "RTSP info",
+                        "description": "업데이트할 RTSP 정보",
                         "name": "rtsp",
                         "in": "body",
                         "required": true,
@@ -110,27 +171,128 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 업데이트 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/address.RTSPInformation"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "잘못된 요청 본문",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인을 찾을 수 없음",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "파이프라인 업데이트 또는 DB 반영 실패",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/active/all": {
+            "get": {
+                "description": "동작중인 모든 활성 파이프라인 정보를 조회하여 GetPipeLineResponse 형태로 반환합니다",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Get all active pipelines",
+                "responses": {
+                    "200": {
+                        "description": "활성 파이프라인 조회 성공",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/main.GetPipeLineResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "파이프라인 조회 실패",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -138,7 +300,7 @@ const docTemplate = `{
         },
         "/pipeline/all": {
             "get": {
-                "description": "모든 파이프라인 정보를 반환합니다.",
+                "description": "모든 파이프라인 설정 정보를 DB에서 조회하여 RTSPInformation 형태로 반환합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -148,14 +310,48 @@ const docTemplate = `{
                 "summary": "Get all pipelines",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "모든 파이프라인 조회 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/address.RTSPInformation"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "파이프라인 조회 실패",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "delete": {
+                "description": "모든 파이프라인을 정리하고 DB에서도 모두 삭제합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -165,15 +361,39 @@ const docTemplate = `{
                 "summary": "Delete all pipelines",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "모든 파이프라인 삭제 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인 삭제 실패",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -181,7 +401,7 @@ const docTemplate = `{
         },
         "/pipeline/{streamName}": {
             "get": {
-                "description": "streamName에 해당하는 파이프라인 정보를 반환합니다.",
+                "description": "streamName에 해당하는 파이프라인 정보를 DB에서 조회하여 반환합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -192,7 +412,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Pipeline (stream) name",
+                        "description": "파이프라인 이름",
                         "name": "streamName",
                         "in": "path",
                         "required": true
@@ -200,20 +420,45 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 조회 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/main.GetPipeLineResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인을 찾을 수 없음",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
             },
             "delete": {
+                "description": "streamName 파이프라인을 정지하고 삭제한 후 DB에서도 하드 삭제합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -224,7 +469,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Pipeline (stream) name",
+                        "description": "삭제할 파이프라인 이름",
                         "name": "streamName",
                         "in": "path",
                         "required": true
@@ -232,15 +477,39 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 삭제 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인 삭제 실패",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -248,7 +517,7 @@ const docTemplate = `{
         },
         "/pipeline/{streamName}/start": {
             "post": {
-                "description": "streamName 파이프라인을 실행 상태로 변경합니다.",
+                "description": "streamName 파이프라인을 실행 상태로 변경하고 DB에 상태를 업데이트합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -259,7 +528,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Pipeline (stream) name",
+                        "description": "시작할 파이프라인 이름",
                         "name": "streamName",
                         "in": "path",
                         "required": true
@@ -267,13 +536,66 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 시작 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인 시작 실패",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/pipeline/{streamName}/status": {
+            "get": {
+                "description": "streamName 파이프라인의 실시간 상태 정보를 반환합니다 (TODO: 구현 예정)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Get pipeline status by name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "파이프라인 이름",
+                        "name": "streamName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "파이프라인 상태 조회",
                         "schema": {
                             "$ref": "#/definitions/main.responseSchema"
                         }
@@ -283,7 +605,7 @@ const docTemplate = `{
         },
         "/pipeline/{streamName}/stop": {
             "post": {
-                "description": "streamName 파이프라인을 정지 상태로 변경합니다.",
+                "description": "streamName 파이프라인을 정지 상태로 변경하고 DB에 상태를 업데이트합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -294,7 +616,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Pipeline (stream) name",
+                        "description": "정지할 파이프라인 이름",
                         "name": "streamName",
                         "in": "path",
                         "required": true
@@ -302,15 +624,39 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "파이프라인 정지 성공",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "파이프라인 정지 실패",
                         "schema": {
-                            "$ref": "#/definitions/main.responseSchema"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -340,6 +686,47 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "url": {
+                    "type": "string"
+                },
+                "use_gpu": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.GetPipeLineResponse": {
+            "type": "object",
+            "properties": {
+                "bitrate": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "hls_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "max_files": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "playlist_length": {
+                    "type": "integer"
+                },
+                "rtsp_url": {
+                    "type": "string"
+                },
+                "target_duration": {
+                    "type": "integer"
+                },
+                "updated_at": {
                     "type": "string"
                 },
                 "use_gpu": {
