@@ -59,15 +59,15 @@ const docTemplate = `{
                 "tags": [
                     "pipeline"
                 ],
-                "summary": "Create a pipeline (PUT)",
+                "summary": "Create a new pipeline",
                 "parameters": [
                     {
-                        "description": "새 파이프라인 RTSP 정보",
+                        "description": "새 파이프라인 RTSP 정보 (ID 필드 제외)",
                         "name": "rtsp",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/address.RTSPInformation"
+                            "$ref": "#/definitions/main.RTSPInformationRequest"
                         }
                     }
                 ],
@@ -157,15 +157,15 @@ const docTemplate = `{
                 "tags": [
                     "pipeline"
                 ],
-                "summary": "Update a pipeline (POST)",
+                "summary": "Update a pipeline",
                 "parameters": [
                     {
-                        "description": "업데이트할 RTSP 정보",
+                        "description": "업데이트할 RTSP 정보 (ID 필드 제외)",
                         "name": "rtsp",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/address.RTSPInformation"
+                            "$ref": "#/definitions/main.RTSPInformationRequest"
                         }
                     }
                 ],
@@ -181,7 +181,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/address.RTSPInformation"
+                                            "$ref": "#/definitions/main.RTSPInformationRequest"
                                         }
                                     }
                                 }
@@ -247,7 +247,7 @@ const docTemplate = `{
         },
         "/pipeline/active/all": {
             "get": {
-                "description": "동작중인 모든 활성 파이프라인 정보를 조회하여 GetPipeLineResponse 형태로 반환합니다",
+                "description": "동작중인 모든 활성 파이프라인 정보를 조회하여 GetPipeLineResponse 배열로 반환합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -276,31 +276,13 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "404": {
-                        "description": "파이프라인 조회 실패",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.responseSchema"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
                     }
                 }
             }
         },
         "/pipeline/all": {
             "get": {
-                "description": "모든 파이프라인 설정 정보를 DB에서 조회하여 RTSPInformation 형태로 반환합니다",
+                "description": "모든 파이프라인 설정 정보를 DB에서 조회하여 GetPipeLineResponse 배열로 반환합니다",
                 "produces": [
                     "application/json"
                 ],
@@ -322,7 +304,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/address.RTSPInformation"
+                                                "$ref": "#/definitions/main.GetPipeLineResponse"
                                             }
                                         }
                                     }
@@ -664,35 +646,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "address.RTSPInformation": {
-            "type": "object",
-            "properties": {
-                "bitrate": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "max_files": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "playlist_length": {
-                    "type": "integer"
-                },
-                "target_duration": {
-                    "type": "integer"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "use_gpu": {
-                    "type": "boolean"
-                }
-            }
-        },
         "main.GetPipeLineResponse": {
             "type": "object",
             "properties": {
@@ -728,6 +681,32 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "use_gpu": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.RTSPInformationRequest": {
+            "type": "object",
+            "properties": {
+                "bitrate": {
+                    "type": "integer"
+                },
+                "max_files": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "playlist_length": {
+                    "type": "integer"
+                },
+                "rtsp_url": {
+                    "type": "string"
+                },
+                "target_duration": {
+                    "type": "integer"
                 },
                 "use_gpu": {
                     "type": "boolean"

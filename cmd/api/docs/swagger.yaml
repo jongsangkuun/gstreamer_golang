@@ -1,24 +1,5 @@
 basePath: /
 definitions:
-  address.RTSPInformation:
-    properties:
-      bitrate:
-        type: integer
-      id:
-        type: integer
-      max_files:
-        type: integer
-      name:
-        type: string
-      playlist_length:
-        type: integer
-      target_duration:
-        type: integer
-      url:
-        type: string
-      use_gpu:
-        type: boolean
-    type: object
   main.GetPipeLineResponse:
     properties:
       bitrate:
@@ -43,6 +24,23 @@ definitions:
         type: integer
       updated_at:
         type: string
+      use_gpu:
+        type: boolean
+    type: object
+  main.RTSPInformationRequest:
+    properties:
+      bitrate:
+        type: integer
+      max_files:
+        type: integer
+      name:
+        type: string
+      playlist_length:
+        type: integer
+      rtsp_url:
+        type: string
+      target_duration:
+        type: integer
       use_gpu:
         type: boolean
     type: object
@@ -87,12 +85,12 @@ paths:
       - application/json
       description: 기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다
       parameters:
-      - description: 업데이트할 RTSP 정보
+      - description: 업데이트할 RTSP 정보 (ID 필드 제외)
         in: body
         name: rtsp
         required: true
         schema:
-          $ref: '#/definitions/address.RTSPInformation'
+          $ref: '#/definitions/main.RTSPInformationRequest'
       produces:
       - application/json
       responses:
@@ -103,7 +101,7 @@ paths:
             - $ref: '#/definitions/main.responseSchema'
             - properties:
                 data:
-                  $ref: '#/definitions/address.RTSPInformation'
+                  $ref: '#/definitions/main.RTSPInformationRequest'
               type: object
         "400":
           description: 잘못된 요청 본문
@@ -132,7 +130,7 @@ paths:
                 data:
                   type: string
               type: object
-      summary: Update a pipeline (POST)
+      summary: Update a pipeline
       tags:
       - pipeline
     put:
@@ -140,12 +138,12 @@ paths:
       - application/json
       description: RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다
       parameters:
-      - description: 새 파이프라인 RTSP 정보
+      - description: 새 파이프라인 RTSP 정보 (ID 필드 제외)
         in: body
         name: rtsp
         required: true
         schema:
-          $ref: '#/definitions/address.RTSPInformation'
+          $ref: '#/definitions/main.RTSPInformationRequest'
       produces:
       - application/json
       responses:
@@ -185,7 +183,7 @@ paths:
                 data:
                   type: string
               type: object
-      summary: Create a pipeline (PUT)
+      summary: Create a new pipeline
       tags:
       - pipeline
   /pipeline/{streamName}:
@@ -340,7 +338,7 @@ paths:
       - pipeline
   /pipeline/active/all:
     get:
-      description: 동작중인 모든 활성 파이프라인 정보를 조회하여 GetPipeLineResponse 형태로 반환합니다
+      description: 동작중인 모든 활성 파이프라인 정보를 조회하여 GetPipeLineResponse 배열로 반환합니다
       produces:
       - application/json
       responses:
@@ -354,15 +352,6 @@ paths:
                   items:
                     $ref: '#/definitions/main.GetPipeLineResponse'
                   type: array
-              type: object
-        "404":
-          description: 파이프라인 조회 실패
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.responseSchema'
-            - properties:
-                data:
-                  type: string
               type: object
       summary: Get all active pipelines
       tags:
@@ -395,7 +384,7 @@ paths:
       tags:
       - pipeline
     get:
-      description: 모든 파이프라인 설정 정보를 DB에서 조회하여 RTSPInformation 형태로 반환합니다
+      description: 모든 파이프라인 설정 정보를 DB에서 조회하여 GetPipeLineResponse 배열로 반환합니다
       produces:
       - application/json
       responses:
@@ -407,7 +396,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/address.RTSPInformation'
+                    $ref: '#/definitions/main.GetPipeLineResponse'
                   type: array
               type: object
         "404":
