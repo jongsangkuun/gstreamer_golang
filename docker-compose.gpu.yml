@@ -38,7 +38,7 @@ services:
     volumes:
       - ./hls_output:/app/hls_output
     depends_on:
-      - rtsp2hls
+      - api
     networks:
       - rtsp_network
     entrypoint:
