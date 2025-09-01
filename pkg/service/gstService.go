@@ -27,7 +27,7 @@ func GstServiceStart(env common.Env, dbConn *gorm.DB) (*glib.MainLoop, *pipe.Pip
 
 	var addresses address.RTSPInformationList
 
-	allRtspStreams, err := db.GetAllRTSPStreams(dbConn)
+	allRtspStreams, err := db.GetAllActiveRTSPStreams(dbConn)
 
 	for _, stream := range allRtspStreams {
 		addresses = append(addresses, stream.ToRTSPInformation())

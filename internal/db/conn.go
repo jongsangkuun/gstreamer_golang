@@ -42,7 +42,7 @@ func ConnectSQLite(dbPath string) (*gorm.DB, error) {
 	}
 
 	// SQLite 드라이버 옵션 설정
-	dsn := fmt.Sprintf("%s?cache=shared&mode=rwc&_journal_mode=WAL&_synchronous=NORMAL&_cache_size=10000&_foreign_keys=on", dbPath)
+	dsn := fmt.Sprintf("%s?cache=shared&mode=rwc&_journal_mode=DELETE&_synchronous=FULL&_cache_size=10000&_foreign_keys=on", dbPath)
 
 	// GORM으로 SQLite 연결
 	db, err := gorm.Open(sqlite.Open(dsn), config)
@@ -161,8 +161,8 @@ func SeedData(db *gorm.DB) error {
 }
 
 // RTSP Stream 관련 데이터베이스 함수들
-func GetAllRTSPStreams(db *gorm.DB) ([]RTSPStream, error) {
-	var streams []RTSPStream
+func GetAllActiveRTSPStreams(db *gorm.DB) ([]*RTSPStream, error) {
+	var streams []*RTSPStream
 	err := db.Where("is_active = ?", true).Find(&streams).Error
 	return streams, err
 }
@@ -238,18 +238,18 @@ func DeleteAllRTSPStream(db *gorm.DB) error {
 }
 
 // 모든 RTSP Stream을 RTSPInformation 형태로 반환
-func GetAllRTSPInformations(db *gorm.DB) (address.RTSPInformationList, error) {
-	streams, err := GetAllRTSPStreams(db)
+func GetAllRTSPInformations(db *gorm.DB) ([]*RTSPStream, error) {
+	streams, err := GetAllActiveRTSPStreams(db)
 	if err != nil {
 		return nil, err
 	}
 
-	var rtspList address.RTSPInformationList
+	var rtspStream []*RTSPStream
 	for _, stream := range streams {
-		rtspList = append(rtspList, stream.ToRTSPInformation())
+		rtspStream = append(rtspStream, stream)
 	}
 
-	return rtspList, nil
+	return rtspStream, nil
 }
 
 // 데이터베이스 전체 초기화

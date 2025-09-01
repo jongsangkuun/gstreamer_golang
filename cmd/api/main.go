@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -55,6 +56,23 @@ func ConvertDBtoResponse(dbData db.RTSPStream, env common.Env) GetPipeLineRespon
 	}
 }
 
+func ConvertPipelineInfoToResponse(rtspInfo *address.RTSPInformation, env common.Env) GetPipeLineResponse {
+	return GetPipeLineResponse{
+		Id:             rtspInfo.Id,
+		Name:           rtspInfo.Name,
+		RtspURL:        rtspInfo.URL,
+		HlsURL:         fmt.Sprintf("%s:%s/%s/index.m3u8", env.FileServerHost, env.FileServerPort, rtspInfo.Name),
+		Bitrate:        rtspInfo.Bitrate,
+		UseGPU:         rtspInfo.UseGPU,
+		MaxFiles:       rtspInfo.MaxFiles,
+		PlaylistLength: rtspInfo.PlaylistLength,
+		TargetDuration: rtspInfo.TargetDuration,
+		IsActive:       true,                                     // 기본값 또는 별도 로직 필요
+		CreatedAt:      time.Now().Format("2006-01-02 15:04:05"), // 임시 값
+		UpdatedAt:      time.Now().Format("2006-01-02 15:04:05"), // 임시 값
+	}
+}
+
 func createResponse(status int, message string, data interface{}) responseSchema {
 	return responseSchema{
 		Status:  status,
@@ -70,20 +88,46 @@ func healthHandler(c *gin.Context) {
 
 func getAllPipelinesHandler(dbConn *gorm.DB, env common.Env) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		data, err := db.GetAllRTSPStreams(dbConn)
+		log.Info("getAllPipelinesHandler")
+		data, err := db.GetAllRTSPInformations(dbConn)
 		if err != nil {
 			response := createResponse(http.StatusNotFound, "fail", err.Error())
 			c.JSON(http.StatusNotFound, response)
 			return
 		}
 
-		var pipelineResponse []GetPipeLineResponse
+		var info []GetPipeLineResponse
 		for _, stream := range data {
-			info := ConvertDBtoResponse(stream, env)
-			pipelineResponse = append(pipelineResponse, info)
+			info = append(info, ConvertDBtoResponse(*stream, env))
 		}
 
-		response := createResponse(http.StatusOK, "success", pipelineResponse)
+		response := createResponse(http.StatusOK, "success", info)
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+func getAllActivePipelinesHandler(pm *pipeline.PipelineManager, env common.Env) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		log.Info("getAllActivePipelinesHandler")
+		data := pm.GetAllPipelineInfo()
+
+		var info []GetPipeLineResponse
+		for streamName, stream := range data {
+			if stream == nil {
+				log.WithField("streamName", streamName).Warn("파이프라인 정보가 nil입니다. 건너뜁니다.")
+				continue
+			}
+
+			if stream.RtspInformation == nil {
+				log.WithField("streamName", streamName).Warn("RtspInformation이 nil입니다. 건너뜁니다.")
+				continue
+			}
+
+			convertedData := ConvertPipelineInfoToResponse(stream.RtspInformation, env)
+			info = append(info, convertedData)
+		}
+
+		response := createResponse(http.StatusOK, "success", data)
 		c.JSON(http.StatusOK, response)
 	}
 }
@@ -286,14 +330,18 @@ func main() {
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.GET("/health", healthHandler)
+
 	router.GET("/pipeline/all", getAllPipelinesHandler(dbConn, env))
+	router.GET("/pipeline/active/all", getAllActivePipelinesHandler(pm, env))
 	router.GET("/pipeline/:streamName", getPipelineByNameHandler(dbConn, env))
-	router.GET("/pipeline/all/status", func(c *gin.Context) {})
 	router.GET("/pipeline/:streamName/status", func(c *gin.Context) {})
+
 	router.POST("/pipeline/:streamName/start", startPipelineHandler(dbConn, pm))
 	router.POST("/pipeline/:streamName/stop", stopPipelineHandler(dbConn, pm))
+	router.POST("/pipeline", updatePipelineHandler(dbConn, pm, env))
+
 	router.PUT("/pipeline", createPipelineHandler(dbConn, pm, env))
-	router.PATCH("/pipeline", updatePipelineHandler(dbConn, pm, env))
+
 	router.DELETE("/pipeline/:streamName", deletePipelineHandler(dbConn, pm))
 	router.DELETE("/pipeline/all", deleteAllPipelinesHandler(dbConn, pm))
 
