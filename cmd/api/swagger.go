@@ -8,6 +8,7 @@ import (
 var _ address.RTSPInformation
 var _ responseSchema
 var _ GetPipeLineResponse
+var _ RTSPInformationRequest
 
 // 이 파일은 Swagger 문서 생성을 위한 더미(handler) 정의만 포함합니다.
 // 실제 라우팅/로직은 main.go에 있고, 여기 함수들은 호출되지 않습니다.
@@ -95,8 +96,8 @@ func docStopPipeline() {}
 // @Tags    pipeline
 // @Accept  json
 // @Produce json
-// @Param   rtsp body address.RTSPInformation true "업데이트할 RTSP 정보"
-// @Success 200 {object} responseSchema{data=address.RTSPInformation} "파이프라인 업데이트 성공"
+// @Param   rtsp body RTSPInformationRequest true "업데이트할 RTSP 정보 (ID 필드 제외)"
+// @Success 200 {object} responseSchema{data=RTSPInformationRequest} "파이프라인 업데이트 성공"
 // @Failure 400 {object} responseSchema{data=string} "잘못된 요청 본문"
 // @Failure 404 {object} responseSchema{data=string} "파이프라인을 찾을 수 없음"
 // @Failure 500 {object} responseSchema{data=string} "파이프라인 업데이트 또는 DB 반영 실패"
@@ -109,7 +110,7 @@ func docUpdatePipelinePost() {}
 // @Tags    pipeline
 // @Accept  json
 // @Produce json
-// @Param   rtsp body address.RTSPInformation true "새 파이프라인 RTSP 정보"
+// @Param   rtsp body RTSPInformationRequest true "새 파이프라인 RTSP 정보 (ID 필드 제외)"
 // @Success 200 {object} responseSchema{data=string} "파이프라인 생성 성공"
 // @Failure 400 {object} responseSchema{data=string} "잘못된 요청 본문"
 // @Failure 409 {object} responseSchema{data=string} "파이프라인이 이미 존재함"

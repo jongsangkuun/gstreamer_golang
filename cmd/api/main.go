@@ -25,6 +25,31 @@ type responseSchema struct {
 	Data    interface{} `json:"data"`    // Additional Data
 }
 
+// PUT/POST 요청용 구조체 (ID 없음)
+type RTSPInformationRequest struct {
+	Name           string `json:"name"`
+	RtspUrl        string `json:"rtsp_url"`
+	Bitrate        int    `json:"bitrate"`
+	UseGPU         bool   `json:"use_gpu"`
+	MaxFiles       int    `json:"max_files"`
+	PlaylistLength int    `json:"playlist_length"`
+	TargetDuration int    `json:"target_duration"`
+}
+
+// Request를 RTSPInformation으로 변환하는 메서드
+func (r *RTSPInformationRequest) ToRTSPInformation() address.RTSPInformation {
+	return address.RTSPInformation{
+		Id:             0, // ID는 DB에서 자동 할당
+		Name:           r.Name,
+		RtspUrl:        r.RtspUrl,
+		Bitrate:        r.Bitrate,
+		UseGPU:         r.UseGPU,
+		MaxFiles:       r.MaxFiles,
+		PlaylistLength: r.PlaylistLength,
+		TargetDuration: r.TargetDuration,
+	}
+}
+
 type GetPipeLineResponse struct {
 	Id             int    `json:"id"`
 	Name           string `json:"name"`
@@ -195,12 +220,14 @@ func stopPipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager) gin.Hand
 
 func createPipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env common.Env) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var rtspInfo address.RTSPInformation
-		if err := c.ShouldBindJSON(&rtspInfo); err != nil {
+		var rtspReq RTSPInformationRequest
+		if err := c.ShouldBindJSON(&rtspReq); err != nil {
 			response := createResponse(http.StatusBadRequest, "fail", err.Error())
 			c.JSON(http.StatusBadRequest, response)
 			return
 		}
+
+		rtspInfo := rtspReq.ToRTSPInformation()
 
 		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
 			response := createResponse(http.StatusConflict, "fail", "Pipeline already exists")
@@ -230,14 +257,15 @@ func createPipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env co
 
 func updatePipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env common.Env) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var rtspInfo address.RTSPInformation
-		if err := c.ShouldBindJSON(&rtspInfo); err != nil {
+		var rtspReq RTSPInformationRequest
+		if err := c.ShouldBindJSON(&rtspReq); err != nil {
 			response := createResponse(http.StatusBadRequest, "fail", err.Error())
 			c.JSON(http.StatusBadRequest, response)
 			return
 		}
 
-		var rtspData address.RTSPInformation
+		rtspInfo := rtspReq.ToRTSPInformation()
+
 		if _, exists := pm.GetPipeline(rtspInfo.Name); exists {
 			pipeline.CreateStreamPipeline(pm, rtspInfo, env.HlsOutput)
 			_, err := db.UpdateRTSPStream(dbConn, rtspInfo)
@@ -252,7 +280,7 @@ func updatePipelineHandler(dbConn *gorm.DB, pm *pipeline.PipelineManager, env co
 			return
 		}
 
-		response := createResponse(http.StatusOK, "success", rtspData)
+		response := createResponse(http.StatusOK, "success", rtspReq)
 		c.JSON(http.StatusOK, response)
 	}
 }

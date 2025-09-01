@@ -9,7 +9,7 @@ const (
 )
 
 type RTSPInformation struct {
-	Id             int    `json:"id"`
+	Id             int    `json:"id,omitempty"`
 	Name           string `json:"name"`
 	RtspUrl        string `json:"rtsp_url"`
 	Bitrate        int    `json:"bitrate"`
