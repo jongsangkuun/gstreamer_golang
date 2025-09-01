@@ -265,10 +265,18 @@ func InitializeDatabase(dbPath string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// 초기 데이터 삽입
-	if err := SeedData(db); err != nil {
-		log.Printf("초기 데이터 삽입 중 오류: %v", err)
-		// 오류가 있어도 계속 진행
+	// 레코드 수 확인
+	var count int64
+	if err := db.Model(&RTSPStream{}).Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	// DB에 값이 없을 때만 초기 데이터 삽입
+	if count == 0 {
+		if err := SeedData(db); err != nil {
+			log.Printf("초기 데이터 삽입 중 오류: %v", err)
+			// 오류가 있어도 계속 진행
+		}
 	}
 
 	return db, nil
