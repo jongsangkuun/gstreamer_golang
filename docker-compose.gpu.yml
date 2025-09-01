@@ -25,7 +25,7 @@ services:
       - go
     command:
       - run
-      - cmd/convert/main.go
+      - cmd/api/main.go
 
 
   file_server:
