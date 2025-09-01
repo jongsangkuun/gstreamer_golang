@@ -198,7 +198,7 @@ func CreateRTSPStream(db *gorm.DB, rtspInfo address.RTSPInformation) (*RTSPStrea
 
 func UpdateRTSPStream(db *gorm.DB, rtspInfo address.RTSPInformation) (*RTSPStream, error) {
 	var stream RTSPStream
-	if err := db.First(&stream, rtspInfo.Name).Error; err != nil {
+	if err := db.Where("name = ?", rtspInfo.Name).First(&stream).Error; err != nil {
 		return nil, err
 	}
 
