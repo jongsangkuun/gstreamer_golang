@@ -163,7 +163,7 @@ func SeedData(db *gorm.DB) error {
 // RTSP Stream 관련 데이터베이스 함수들
 func GetAllActiveRTSPStreams(db *gorm.DB) ([]*RTSPStream, error) {
 	var streams []*RTSPStream
-	err := db.Where("is_active = ?", true).Find(&streams).Error
+	err := db.Find(&streams).Error
 	return streams, err
 }
 
