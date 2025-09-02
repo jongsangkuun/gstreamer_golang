@@ -76,7 +76,7 @@ func docGetPipelineStatus() {}
 // @Produce json
 // @Success 200 {object} responseSchema{data=string} "파이프라인 시작 성공"
 // @Failure 404 {object} responseSchema{data=string} "파이프라인 시작 실패"
-// @Router  /pipeline/{streamName}/start [post]
+// @Router  /pipeline/{streamName}/start [put]
 func docStartPipeline() {}
 
 // 파이프라인 정지
@@ -87,10 +87,10 @@ func docStartPipeline() {}
 // @Produce json
 // @Success 200 {object} responseSchema{data=string} "파이프라인 정지 성공"
 // @Failure 404 {object} responseSchema{data=string} "파이프라인 정지 실패"
-// @Router  /pipeline/{streamName}/stop [post]
+// @Router  /pipeline/{streamName}/stop [put]
 func docStopPipeline() {}
 
-// 파이프라인 업데이트 (POST)
+// 파이프라인 업데이트 (PUT)
 // @Summary Update a pipeline
 // @Description 기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다
 // @Tags    pipeline
@@ -101,10 +101,10 @@ func docStopPipeline() {}
 // @Failure 400 {object} responseSchema{data=string} "잘못된 요청 본문"
 // @Failure 404 {object} responseSchema{data=string} "파이프라인을 찾을 수 없음"
 // @Failure 500 {object} responseSchema{data=string} "파이프라인 업데이트 또는 DB 반영 실패"
-// @Router  /pipeline [post]
-func docUpdatePipelinePost() {}
+// @Router  /pipeline [put]
+func docUpdatePipelinePut() {}
 
-// 파이프라인 생성 (PUT)
+// 파이프라인 생성 (POST)
 // @Summary Create a new pipeline
 // @Description RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다
 // @Tags    pipeline
@@ -115,8 +115,8 @@ func docUpdatePipelinePost() {}
 // @Failure 400 {object} responseSchema{data=string} "잘못된 요청 본문"
 // @Failure 409 {object} responseSchema{data=string} "파이프라인이 이미 존재함"
 // @Failure 500 {object} responseSchema{data=string} "파이프라인 생성 또는 DB 저장 실패"
-// @Router  /pipeline [put]
-func docCreatePipelinePut() {}
+// @Router  /pipeline [post]
+func docCreatePipelinePost() {}
 
 // 파이프라인 삭제
 // @Summary Delete a pipeline

@@ -372,11 +372,11 @@ func main() {
 	router.GET("/pipeline/:streamName", getPipelineByNameHandler(dbConn, env))
 	router.GET("/pipeline/:streamName/status", func(c *gin.Context) {})
 
-	router.POST("/pipeline/:streamName/start", startPipelineHandler(dbConn, pm))
-	router.POST("/pipeline/:streamName/stop", stopPipelineHandler(dbConn, pm))
-	router.POST("/pipeline", updatePipelineHandler(dbConn, pm, env))
+	router.PUT("/pipeline/:streamName/start", startPipelineHandler(dbConn, pm))
+	router.PUT("/pipeline/:streamName/stop", stopPipelineHandler(dbConn, pm))
+	router.PUT("/pipeline", updatePipelineHandler(dbConn, pm, env))
 
-	router.PUT("/pipeline", createPipelineHandler(dbConn, pm, env))
+	router.POST("/pipeline", createPipelineHandler(dbConn, pm, env))
 
 	router.DELETE("/pipeline/:streamName", deletePipelineHandler(dbConn, pm))
 	router.DELETE("/pipeline/all", deleteAllPipelinesHandler(dbConn, pm))
