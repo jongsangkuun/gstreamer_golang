@@ -83,59 +83,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: 기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다
-      parameters:
-      - description: 업데이트할 RTSP 정보 (ID 필드 제외)
-        in: body
-        name: rtsp
-        required: true
-        schema:
-          $ref: '#/definitions/main.RTSPInformationRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 파이프라인 업데이트 성공
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.responseSchema'
-            - properties:
-                data:
-                  $ref: '#/definitions/main.RTSPInformationRequest'
-              type: object
-        "400":
-          description: 잘못된 요청 본문
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.responseSchema'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "404":
-          description: 파이프라인을 찾을 수 없음
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.responseSchema'
-            - properties:
-                data:
-                  type: string
-              type: object
-        "500":
-          description: 파이프라인 업데이트 또는 DB 반영 실패
-          schema:
-            allOf:
-            - $ref: '#/definitions/main.responseSchema'
-            - properties:
-                data:
-                  type: string
-              type: object
-      summary: Update a pipeline
-      tags:
-      - pipeline
-    put:
-      consumes:
-      - application/json
       description: RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다
       parameters:
       - description: 새 파이프라인 RTSP 정보 (ID 필드 제외)
@@ -184,6 +131,59 @@ paths:
                   type: string
               type: object
       summary: Create a new pipeline
+      tags:
+      - pipeline
+    put:
+      consumes:
+      - application/json
+      description: 기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다
+      parameters:
+      - description: 업데이트할 RTSP 정보 (ID 필드 제외)
+        in: body
+        name: rtsp
+        required: true
+        schema:
+          $ref: '#/definitions/main.RTSPInformationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 파이프라인 업데이트 성공
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.responseSchema'
+            - properties:
+                data:
+                  $ref: '#/definitions/main.RTSPInformationRequest'
+              type: object
+        "400":
+          description: 잘못된 요청 본문
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.responseSchema'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "404":
+          description: 파이프라인을 찾을 수 없음
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.responseSchema'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: 파이프라인 업데이트 또는 DB 반영 실패
+          schema:
+            allOf:
+            - $ref: '#/definitions/main.responseSchema'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Update a pipeline
       tags:
       - pipeline
   /pipeline/{streamName}:
@@ -252,7 +252,7 @@ paths:
       tags:
       - pipeline
   /pipeline/{streamName}/start:
-    post:
+    put:
       description: streamName 파이프라인을 실행 상태로 변경하고 DB에 상태를 업데이트합니다
       parameters:
       - description: 시작할 파이프라인 이름
@@ -304,7 +304,7 @@ paths:
       tags:
       - pipeline
   /pipeline/{streamName}/stop:
-    post:
+    put:
       description: streamName 파이프라인을 정지 상태로 변경하고 DB에 상태를 업데이트합니다
       parameters:
       - description: 정지할 파이프라인 이름

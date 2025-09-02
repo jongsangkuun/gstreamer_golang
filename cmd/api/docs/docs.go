@@ -49,104 +49,6 @@ const docTemplate = `{
         },
         "/pipeline": {
             "put": {
-                "description": "RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "pipeline"
-                ],
-                "summary": "Create a new pipeline",
-                "parameters": [
-                    {
-                        "description": "새 파이프라인 RTSP 정보 (ID 필드 제외)",
-                        "name": "rtsp",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.RTSPInformationRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "파이프라인 생성 성공",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.responseSchema"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "잘못된 요청 본문",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.responseSchema"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "409": {
-                        "description": "파이프라인이 이미 존재함",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.responseSchema"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "파이프라인 생성 또는 DB 저장 실패",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/main.responseSchema"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "post": {
                 "description": "기존 파이프라인을 새 설정으로 업데이트하고 DB에 반영합니다",
                 "consumes": [
                     "application/json"
@@ -226,6 +128,104 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "파이프라인 업데이트 또는 DB 반영 실패",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "RTSP 정보를 받아 새 파이프라인을 생성하고 DB에 저장합니다",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pipeline"
+                ],
+                "summary": "Create a new pipeline",
+                "parameters": [
+                    {
+                        "description": "새 파이프라인 RTSP 정보 (ID 필드 제외)",
+                        "name": "rtsp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RTSPInformationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "파이프라인 생성 성공",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "잘못된 요청 본문",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "409": {
+                        "description": "파이프라인이 이미 존재함",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/main.responseSchema"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "파이프라인 생성 또는 DB 저장 실패",
                         "schema": {
                             "allOf": [
                                 {
@@ -498,7 +498,7 @@ const docTemplate = `{
             }
         },
         "/pipeline/{streamName}/start": {
-            "post": {
+            "put": {
                 "description": "streamName 파이프라인을 실행 상태로 변경하고 DB에 상태를 업데이트합니다",
                 "produces": [
                     "application/json"
@@ -586,7 +586,7 @@ const docTemplate = `{
             }
         },
         "/pipeline/{streamName}/stop": {
-            "post": {
+            "put": {
                 "description": "streamName 파이프라인을 정지 상태로 변경하고 DB에 상태를 업데이트합니다",
                 "produces": [
                     "application/json"
